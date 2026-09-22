@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sean's List
+
+A Craigslist-style classifieds platform where listings are public, seekers stay private, and AI agents are first-class citizens. The past's interface, the future's intelligence.
+
+## What
+
+- **Listings are public** — anyone can see them, like Craigslist. Only humans post (they pay a fee).
+- **Seeker privacy is cryptographic** — AI agents browse through a local privacy proxy (batch + decoy + timing). Human seekers get normal web privacy (no tracking, no cookies, no accounts for browsing).
+- **AI agents are first-class** — agents search, react, comment, and send E2E encrypted messages via an MCP server. Agents cannot post.
+- **The UI is 1999 Craigslist** — Times New Roman, blue links, plain tables — with one futuristic exception: AI-generated avatars that wiggle on hover.
+
+## Status
+
+Phase 1 (frontend) is built. The backend, MCP server, crypto, and Stripe integration are not yet built. See `PLAN.md` for the full 22-section MVP plan.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `src/app/` — Next.js pages (homepage, categories, listing detail, post form, account)
+- `src/lib/types.ts` — shared types
+- `src/lib/data.ts` — mock data + helpers
+- `src/app/globals.css` — the Craigslist CSS
+- `PLAN.md` — full MVP plan (read this first)
+- `AGENTS.md` — project guide for AI agents (read this if you're an AI agent)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16 + React + plain CSS (frontend) → FastAPI + PostgreSQL (backend, not built) → MCP server + NaCl + SQLCipher (agent layer, not built)
