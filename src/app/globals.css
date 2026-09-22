@@ -1,0 +1,318 @@
+@import "tailwindcss";
+
+/* Sean's List — faithful Craigslist styling */
+/* The past's interface, the future's intelligence */
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
+  background: var(--background);
+  color: var(--foreground);
+  margin: 0;
+  padding: 0;
+  line-height: 1.4;
+}
+
+a {
+  color: #0000ee;
+  text-decoration: none;
+}
+a:visited {
+  color: #551a8b;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Header */
+.cl-header {
+  padding: 6px 12px;
+  border-bottom: 1px solid #ccc;
+}
+.cl-header .logo {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+  text-decoration: none;
+}
+.cl-header .logo:hover {
+  text-decoration: none;
+}
+.cl-header .tagline {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
+.cl-header .nav {
+  margin-top: 4px;
+  font-size: 11px;
+}
+.cl-header .nav a {
+  margin-right: 8px;
+}
+
+/* Container */
+.cl-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 8px 12px;
+}
+
+/* Homepage category grid */
+.cl-categories {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+}
+.cl-categories td {
+  padding: 2px 12px 2px 0;
+  vertical-align: top;
+  width: 33%;
+}
+.cl-categories .category {
+  font-weight: bold;
+  font-size: 13px;
+  display: block;
+  margin-bottom: 2px;
+}
+.cl-categories .subcategory {
+  font-weight: normal;
+  font-size: 11px;
+  display: block;
+  line-height: 1.6;
+}
+
+/* City selector */
+.cl-city {
+  padding: 4px 12px;
+  font-size: 11px;
+  color: #666;
+  border-bottom: 1px solid #eee;
+}
+.cl-city strong {
+  color: #000;
+}
+
+/* Listing list */
+.cl-listing-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cl-listing-list li {
+  padding: 3px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.cl-listing-list .price {
+  color: #000;
+  font-weight: normal;
+  margin-left: 4px;
+}
+.cl-listing-list .meta {
+  color: #666;
+  font-size: 11px;
+  margin-left: 8px;
+}
+
+/* Listing detail */
+.cl-listing-detail {
+  padding: 8px 0;
+}
+.cl-listing-detail .breadcrumb {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 8px;
+}
+.cl-listing-detail .title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.cl-listing-detail .poster {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cl-listing-detail .body {
+  margin: 12px 0;
+  white-space: pre-wrap;
+  font-size: 13px;
+}
+.cl-listing-detail .metadata {
+  font-size: 12px;
+  color: #333;
+  margin: 8px 0;
+}
+.cl-listing-detail .metadata .field {
+  margin-right: 16px;
+}
+
+/* Avatar */
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 0;
+  vertical-align: middle;
+  margin-right: 4px;
+  display: inline-block;
+  image-rendering: auto;
+}
+.avatar:hover {
+  animation: avatar-wiggle 0.4s ease;
+}
+@keyframes avatar-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+/* Reaction bar — the one modern-looking element */
+.reaction-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid #ccc;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.reaction-btn {
+  cursor: pointer;
+  font-size: 12px;
+  background: none;
+  border: 1px solid #ddd;
+  padding: 2px 6px;
+  border-radius: 0;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.reaction-btn:hover {
+  background: #f0f0f0;
+}
+.reaction-btn.active {
+  background: #ffffd0;
+  border-color: #d0d000;
+}
+.reaction-btn .count {
+  font-size: 11px;
+  color: #666;
+}
+.reaction-btn .emoji {
+  font-size: 13px;
+}
+
+/* Agent tag */
+.agent-tag {
+  font-size: 10px;
+  background: #e8e8ff;
+  color: #4444aa;
+  padding: 0 3px;
+  border-radius: 0;
+  margin-left: 4px;
+}
+
+/* Comment thread */
+.comment-thread {
+  margin-top: 16px;
+  border-top: 1px solid #ccc;
+  padding-top: 8px;
+}
+.comment-thread .header {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.comment {
+  padding: 6px 0;
+  border-bottom: 1px dotted #ccc;
+}
+.comment .comment-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.comment .anon {
+  font-weight: bold;
+  font-size: 12px;
+}
+.comment .time {
+  color: #666;
+  font-size: 11px;
+}
+.comment .body {
+  margin: 2px 0 2px 32px;
+  font-size: 13px;
+}
+
+/* Post form */
+.cl-form {
+  padding: 8px 0;
+  max-width: 600px;
+}
+.cl-form label {
+  display: block;
+  font-weight: bold;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+.cl-form input,
+.cl-form textarea,
+.cl-form select {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
+  border: 1px solid #999;
+  padding: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.cl-form textarea {
+  min-height: 150px;
+}
+.cl-form button {
+  margin-top: 16px;
+  padding: 6px 16px;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 14px;
+  background: #0000ee;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.cl-form button:hover {
+  background: #0000cc;
+}
+
+/* Footer */
+.cl-footer {
+  padding: 12px;
+  font-size: 11px;
+  color: #666;
+  border-top: 1px solid #ccc;
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Curated badge */
+.curated-badge {
+  font-size: 10px;
+  background: #f0f0e0;
+  color: #666600;
+  padding: 0 3px;
+  margin-left: 4px;
+}
