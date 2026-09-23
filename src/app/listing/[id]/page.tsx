@@ -1,191 +1,125 @@
-"use client";
-
 import Link from "next/link";
-import { use, useState } from "react";
+import { notFound } from "next/navigation";
+import ReactionBar from "@/components/ReactionBar";
+import { TopBar } from "@/components/SiteHeader";
 import {
   mockListings,
   mockComments,
   mockReactions,
   getAvatarUrl,
-  formatTimeAgo,
+  getNextListing,
 } from "@/lib/data";
-import { CATEGORY_LABELS, REACTION_TYPES, type ReactionType } from "@/lib/types";
+import { formatPostedAt, formatPrice } from "@/lib/format";
+import { CATEGORY_LABELS, subcategorySlug } from "@/lib/types";
 
-export default function ListingDetailPage({
+export default async function ListingDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
+  const { id } = await params;
   const listing = mockListings.find((l) => l.id === id);
-  const [activeReactions, setActiveReactions] = useState<Set<ReactionType>>(
-    new Set()
-  );
-
-  if (!listing) {
-    return (
-      <>
-        <header className="cl-header">
-          <Link href="/" className="logo">
-            Sean&apos;s List
-          </Link>
-          <nav className="nav">
-            <Link href="/">home</Link>
-          </nav>
-        </header>
-        <div className="cl-container">
-          <p>Listing not found.</p>
-          <p>
-            <Link href="/">Back to home</Link>
-          </p>
-        </div>
-      </>
-    );
-  }
+  if (!listing) notFound();
 
   const comments = mockComments.filter((c) => c.listingId === id);
-  const reactions = mockReactions[id] || [];
-
-  const toggleReaction = (type: ReactionType) => {
-    setActiveReactions((prev) => {
-      const next = new Set(prev);
-      if (next.has(type)) {
-        next.delete(type);
-      } else {
-        next.add(type);
-      }
-      return next;
-    });
-  };
+  const agentComments = comments.filter((c) => c.isAgent).length;
+  const reactions = mockReactions[id] ?? [];
+  const next = getNextListing(listing);
+  const price = formatPrice(listing);
+  const { location, skills } = listing.metadata;
+  const subcategoryHref = `/${listing.category}/${subcategorySlug(listing.subcategory)}`;
 
   return (
-    <>
-      <header className="cl-header">
-        <Link href="/" className="logo">
-          Sean&apos;s List
-        </Link>
-        <div className="tagline">san francisco</div>
-        <nav className="nav">
-          <Link href="/">home</Link>
-          <Link href="/post">post</Link>
-          <Link href="/account">my account</Link>
-        </nav>
-      </header>
+    <main className="page">
+      <TopBar
+        crumbs={
+          <>
+            <Link href={`/${listing.category}`}>{CATEGORY_LABELS[listing.category]}</Link> /{" "}
+            <Link href={subcategoryHref}>{listing.subcategory}</Link>
+          </>
+        }
+        right={
+          next ? (
+            <Link href={`/listing/${next.id}`}>next in {listing.subcategory} →</Link>
+          ) : (
+            <Link href={subcategoryHref}>back to {listing.subcategory}</Link>
+          )
+        }
+      />
 
-      <div className="cl-city">
-        <strong>san francisco</strong> &gt;{" "}
-        <Link href={`/${listing.category}`}>
-          {CATEGORY_LABELS[listing.category]}
-        </Link>{" "}
-        &gt; <strong>{listing.title}</strong>
-      </div>
-
-      <div className="cl-container">
-        <div className="cl-listing-detail">
-          <div className="breadcrumb">
-            {listing.subcategory} &middot;{" "}
-            <Link href={`/${listing.category}`}>
-              {CATEGORY_LABELS[listing.category]}
-            </Link>
-          </div>
-
-          <div className="title">{listing.title}</div>
-
+      <div className="listing">
+        <article>
           <div className="poster">
-            {/* eslint-disable @next/next/no-img-element */}
-            <img
-              src={getAvatarUrl(listing.avatarSeed)}
-              alt=""
-              className="avatar"
-            />
-            <strong>{listing.anonHandle}</strong> &middot;{" "}
-            {formatTimeAgo(listing.createdAt)} &middot; {listing.viewCount}{" "}
-            views
-            {listing.isCurated && (
-              <span className="curated-badge">curated</span>
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element -- local data: URI */}
+            <img src={getAvatarUrl(listing.avatarSeed)} alt="" className="avatar avatar-lg" />
+            <div>
+              <div className="meta">
+                {listing.anonHandle} · posted {formatPostedAt(listing.createdAt)} ·{" "}
+                {listing.viewCount} views
+                {listing.isCurated && <> · curated seed</>}
+              </div>
+              <h1>{listing.title}</h1>
+            </div>
           </div>
 
-          <div className="body">{listing.body}</div>
+          {(price || location) && (
+            <div className="price-line">
+              {price && <span className="price">{price}</span>}
+              {location && <span className="where">{location}</span>}
+            </div>
+          )}
 
-          <div className="metadata">
-            {listing.metadata.price !== undefined && (
-              <span className="field">
-                <strong>${listing.metadata.price}</strong>
-              </span>
-            )}
-            {listing.metadata.salaryRange && (
-              <span className="field">
-                <strong>{listing.metadata.salaryRange}</strong>
-              </span>
-            )}
-            {listing.metadata.location && (
-              <span className="field">📍 {listing.metadata.location}</span>
-            )}
-            {listing.metadata.skills && (
-              <span className="field">
-                skills: {listing.metadata.skills.join(", ")}
-              </span>
-            )}
-          </div>
+          <p className="listing-body">{listing.body}</p>
 
-          {/* Reaction bar — the one modern-looking element */}
-          <div className="reaction-bar">
-            {REACTION_TYPES.map(({ type, glyph, label }) => {
-              const count =
-                reactions.find((r) => r.type === type)?.count || 0;
-              const isActive = activeReactions.has(type);
-              const displayCount = count + (isActive ? 1 : 0);
-              return (
-                <button
-                  key={type}
-                  className={`reaction-btn ${isActive ? "active" : ""}`}
-                  onClick={() => toggleReaction(type)}
-                  type="button"
-                >
-                  <span className="emoji">{glyph}</span>
-                  <span className="count">{displayCount}</span>
-                </button>
-              );
-            })}
-          </div>
+          {skills && (
+            <dl className="facts">
+              <dt>skills</dt>
+              <dd>{skills.join(", ")}</dd>
+            </dl>
+          )}
 
-          {/* Comment thread */}
-          <div className="comment-thread">
-            <div className="header">Comments ({comments.length})</div>
+          <ReactionBar reactions={reactions} />
+        </article>
+
+        <aside>
+          <button type="button" className="btn btn-primary btn-block" disabled title="Messaging arrives with the backend">
+            Message {listing.anonHandle} privately
+          </button>
+          <p className="fine">
+            end-to-end encrypted · works for you or your agent
+            <br />
+            (messaging isn&apos;t built yet)
+          </p>
+
+          <section className="conversation" aria-labelledby="conversation-heading">
+            <h2 id="conversation-heading">
+              The conversation
+              <span className="mono">
+                {comments.length} {comments.length === 1 ? "reply" : "replies"}
+                {agentComments > 0 && <> · {agentComments} agent</>}
+              </span>
+            </h2>
             {comments.length === 0 ? (
-              <p style={{ color: "#666", fontSize: "13px" }}>
-                No comments yet. Be the first to say something.
-              </p>
+              <p className="muted">No replies yet.</p>
             ) : (
               comments.map((comment) => (
-                <div key={comment.id} className="comment">
-                  <div className="comment-header">
-                    {/* eslint-disable @next/next/no-img-element */}
-                    <img
-                      src={getAvatarUrl(comment.avatarSeed)}
-                      alt=""
-                      className="avatar"
-                    />
-                    <span className="anon">{comment.anonHandle}</span>
-                    <span className="time">
-                      &middot; {formatTimeAgo(comment.createdAt)}
+                <div key={comment.id} className={`comment${comment.isAgent ? " is-agent" : ""}`}>
+                  <div className="head">
+                    <span className="who">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- local data: URI */}
+                      <img src={getAvatarUrl(comment.avatarSeed)} alt="" className="avatar avatar-sm" />
+                      {comment.anonHandle}
+                      {comment.isAgent && <span className="badge badge-agent">agent</span>}
                     </span>
-                    {comment.isAgent && (
-                      <span className="agent-tag">agent</span>
-                    )}
+                    <span className="muted">{formatPostedAt(comment.createdAt)}</span>
                   </div>
                   <div className="body">{comment.body}</div>
                 </div>
               ))
             )}
-          </div>
-        </div>
+          </section>
+        </aside>
       </div>
-
-      <footer className="cl-footer">
-        Sean&apos;s List &mdash; postings are public, seeking is private.
-      </footer>
-    </>
+    </main>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { TopBar } from "@/components/SiteHeader";
 import { CATEGORY_LABELS, SUBCATEGORIES, type Category } from "@/lib/types";
 
 export default function PostPage() {
@@ -19,125 +20,120 @@ export default function PostPage() {
 
   if (submitted) {
     return (
-      <>
-        <header className="cl-header">
-          <Link href="/" className="logo">
-            Sean&apos;s List
-          </Link>
-          <nav className="nav">
-            <Link href="/">home</Link>
-            <Link href="/post">post</Link>
-            <Link href="/account">my account</Link>
-          </nav>
-        </header>
-        <div className="cl-container">
-          <h2>Listing submitted for review</h2>
-          <p style={{ marginTop: "8px" }}>
-            Your listing &quot;<strong>{title}</strong>&quot; has been submitted
-            and will go live after moderation.
+      <main className="page">
+        <TopBar crumbs="post a listing" />
+        <div className="panel">
+          <h1 className="page-title">Submitted for review</h1>
+          <p>
+            Your listing &ldquo;<strong>{title}</strong>&rdquo; has been submitted and will go
+            live after moderation.
           </p>
-          <p style={{ marginTop: "12px" }}>
-            <Link href="/">Back to home</Link>
+          <p>
+            <Link href="/" className="btn">
+              Back to the board
+            </Link>
           </p>
         </div>
-      </>
+      </main>
     );
   }
 
   return (
-    <>
-      <header className="cl-header">
-        <Link href="/" className="logo">
-          Sean&apos;s List
-        </Link>
-        <div className="tagline">san francisco</div>
-        <nav className="nav">
-          <Link href="/">home</Link>
-          <Link href="/post">post</Link>
-          <Link href="/account">my account</Link>
-        </nav>
-      </header>
-
-      <div className="cl-city">
-        <strong>san francisco</strong> &gt; post a listing
-      </div>
-
-      <div className="cl-container">
-        <h2 style={{ fontSize: "14px", fontWeight: "bold", margin: "8px 0" }}>
-          Post a listing
-        </h2>
-        <p style={{ fontSize: "12px", color: "#666", marginBottom: "12px" }}>
-          You need an account to post. <Link href="/account/create">Create one</Link>{" "}
-            or <Link href="/account/login">log in</Link>.
+    <main className="page">
+      <TopBar crumbs="post a listing" />
+      <div className="panel">
+        <h1 className="page-title">Post a listing</h1>
+        <p className="notice">
+          Posting needs an account and a small fee, whether you&apos;re a person or an agent.{" "}
+          <Link href="/account/create">Create an account</Link> or{" "}
+          <Link href="/account/login">log in</Link>.
         </p>
 
-        <form className="cl-form" onSubmit={handleSubmit}>
-          <label htmlFor="category">Category</label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as Category)}
-          >
-            {(Object.keys(CATEGORY_LABELS) as Category[]).map((cat) => (
-              <option key={cat} value={cat}>
-                {CATEGORY_LABELS[cat]}
-              </option>
-            ))}
-          </select>
+        <form className="form" onSubmit={handleSubmit}>
+          <div className="field-row">
+            <div className="field">
+              <label htmlFor="category">Category</label>
+              <select
+                id="category"
+                className="select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as Category)}
+              >
+                {(Object.keys(CATEGORY_LABELS) as Category[]).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {CATEGORY_LABELS[cat]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="subcategory">Subcategory</label>
+              <select id="subcategory" className="select">
+                {SUBCATEGORIES[category].map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-          <label htmlFor="subcategory">Subcategory</label>
-          <select id="subcategory">
-            {SUBCATEGORIES[category].map((sub) => (
-              <option key={sub} value={sub}>
-                {sub}
-              </option>
-            ))}
-          </select>
+          <div className="field">
+            <label htmlFor="title">Title</label>
+            <input
+              id="title"
+              className="input"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Short, descriptive title"
+              required
+            />
+          </div>
 
-          <label htmlFor="title">Title</label>
-          <input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Short, descriptive title"
-            required
-          />
+          <div className="field-row">
+            <div className="field">
+              <label htmlFor="price">
+                Price <span className="hint">if applicable</span>
+              </label>
+              <input
+                id="price"
+                className="input"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="$"
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="location">Location</label>
+              <input
+                id="location"
+                className="input"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g. Mission District, SF"
+              />
+            </div>
+          </div>
 
-          <label htmlFor="body">Description</label>
-          <textarea
-            id="body"
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="Describe what you're selling, offering, or looking for..."
-            required
-          />
+          <div className="field">
+            <label htmlFor="body">Description</label>
+            <textarea
+              id="body"
+              className="textarea"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="Describe what you're selling, offering, or looking for..."
+              required
+            />
+          </div>
 
-          <label htmlFor="price">Price (if applicable)</label>
-          <input
-            id="price"
-            type="text"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="$"
-          />
-
-          <label htmlFor="location">Location (neighborhood, city)</label>
-          <input
-            id="location"
-            type="text"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g. Mission District, SF"
-          />
-
-          <button type="submit">Submit listing</button>
+          <div>
+            <button type="submit" className="btn btn-primary">
+              Submit listing
+            </button>
+          </div>
         </form>
       </div>
-
-      <footer className="cl-footer">
-        Sean&apos;s List &mdash; postings are public, seeking is private.
-      </footer>
-    </>
+    </main>
   );
 }

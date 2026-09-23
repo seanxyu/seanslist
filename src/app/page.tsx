@@ -1,103 +1,19 @@
-import Link from "next/link";
-import {
-  CATEGORY_LABELS,
-  SUBCATEGORIES,
-  type Category,
-} from "@/lib/types";
+import { connection } from "next/server";
+import CategoryChips from "@/components/CategoryChips";
+import ListingGrid from "@/components/ListingGrid";
+import { Masthead } from "@/components/SiteHeader";
+import { getAllListings } from "@/lib/data";
 
-export default function HomePage() {
-  const col1: Category[] = ["community", "personals"];
-  const col2: Category[] = ["housing", "services"];
-  const col3: Category[] = ["jobs", "for_sale"];
+export default async function HomePage() {
+  // Render per request so card times ("9:45 AM") stay current.
+  await connection();
 
   return (
-    <>
-      <header className="cl-header">
-        <Link href="/" className="logo">
-          Sean&apos;s List
-        </Link>
-        <div className="tagline">
-          san francisco &middot; the past&apos;s interface, the future&apos;s intelligence
-        </div>
-        <nav className="nav">
-          <Link href="/">home</Link>
-          <Link href="/post">post</Link>
-          <Link href="/account">my account</Link>
-        </nav>
-      </header>
-
-      <div className="cl-city">
-        <strong>san francisco</strong> &gt; all categories
-      </div>
-
-      <div className="cl-container">
-        <table className="cl-categories">
-          <tbody>
-            <tr>
-              <td valign="top">
-                {col1.map((cat) => (
-                  <div key={cat} style={{ marginBottom: "12px" }}>
-                    <Link href={`/${cat}`} className="category">
-                      {CATEGORY_LABELS[cat]}
-                    </Link>
-                    {SUBCATEGORIES[cat].map((sub) => (
-                      <span key={sub} className="subcategory">
-                        {"\u00A0\u00A0\u00A0\u00A0"}
-                        <Link href={`/${cat}/${sub.replace(/\s+/g, "-")}`}>
-                          {sub}
-                        </Link>
-                        <br />
-                      </span>
-                    ))}
-                  </div>
-                ))}
-              </td>
-              <td valign="top">
-                {col2.map((cat) => (
-                  <div key={cat} style={{ marginBottom: "12px" }}>
-                    <Link href={`/${cat}`} className="category">
-                      {CATEGORY_LABELS[cat]}
-                    </Link>
-                    {SUBCATEGORIES[cat].map((sub) => (
-                      <span key={sub} className="subcategory">
-                        {"\u00A0\u00A0\u00A0\u00A0"}
-                        <Link href={`/${cat}/${sub.replace(/\s+/g, "-")}`}>
-                          {sub}
-                        </Link>
-                        <br />
-                      </span>
-                    ))}
-                  </div>
-                ))}
-              </td>
-              <td valign="top">
-                {col3.map((cat) => (
-                  <div key={cat} style={{ marginBottom: "12px" }}>
-                    <Link href={`/${cat}`} className="category">
-                      {CATEGORY_LABELS[cat]}
-                    </Link>
-                    {SUBCATEGORIES[cat].map((sub) => (
-                      <span key={sub} className="subcategory">
-                        {"\u00A0\u00A0\u00A0\u00A0"}
-                        <Link href={`/${cat}/${sub.replace(/\s+/g, "-")}`}>
-                          {sub}
-                        </Link>
-                        <br />
-                      </span>
-                    ))}
-                  </div>
-                ))}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <footer className="cl-footer">
-        Sean&apos;s List &mdash; a classifieds platform where listings are public and seekers stay private.
-        <br />
-        Some listings curated by an AI agent from public sources. Not all curators are real users.
-      </footer>
-    </>
+    <main className="page">
+      <Masthead />
+      <CategoryChips />
+      <h1 className="visually-hidden">Newest listings in San Francisco</h1>
+      <ListingGrid listings={getAllListings()} />
+    </main>
   );
 }

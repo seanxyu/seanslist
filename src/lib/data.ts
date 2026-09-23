@@ -1,4 +1,6 @@
-import type { Listing, Comment, Reaction } from "./types";
+import { createAvatar } from "@dicebear/core";
+import * as bottts from "@dicebear/bottts";
+import type { Category, Listing, Comment, Reaction } from "./types";
 
 // Mock data — curated SF listings for the cold start
 // In production, this comes from the FastAPI backend
@@ -210,20 +212,70 @@ export const mockReactions: Record<string, Reaction[]> = {
   ],
 };
 
-export function getAvatarUrl(seed: string): string {
-  return `https://api.dicebear.com/9.x/bottts/svg?seed=${encodeURIComponent(seed)}`;
+// Mock query helpers — replace with API calls when the backend exists.
+// Results are newest first, like Craigslist's index pages.
+const newestFirst = (a: Listing, b: Listing) => b.createdAt.localeCompare(a.createdAt);
+
+export function getAllListings(): Listing[] {
+  return [...mockListings].sort(newestFirst);
 }
 
-export function formatTimeAgo(iso: string): string {
-  const now = new Date();
-  const then = new Date(iso);
-  const diffMs = now.getTime() - then.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffHr = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHr / 24);
+export function getListings(category: Category, subcategory?: string): Listing[] {
+  return mockListings
+    .filter((l) => l.category === category && (!subcategory || l.subcategory === subcategory))
+    .sort(newestFirst);
+}
 
-  if (diffMin < 60) return `${diffMin} min ago`;
-  if (diffHr < 24) return `${diffHr}h ago`;
-  if (diffDay === 1) return "1d ago";
-  return `${diffDay}d ago`;
+export function searchListings(query: string, category?: Category): Listing[] {
+  const q = query.trim().toLowerCase();
+  return mockListings
+    .filter((l) => !category || l.category === category)
+    .filter(
+      (l) =>
+        !q ||
+        [l.title, l.body, l.subcategory, l.metadata.location ?? ""].some((field) =>
+          field.toLowerCase().includes(q)
+        )
+    )
+    .sort(newestFirst);
+}
+
+export function countListings(category?: Category): number {
+  return mockListings.filter((l) => !category || l.category === category).length;
+}
+
+export interface ListingStats {
+  reactions: Reaction[];
+  comments: number;
+  agentComments: number;
+}
+
+// Public signals shown on cards: reactions and reply counts. Never anything
+// about who viewed or searched — the platform can't see that.
+export function getListingStats(id: string): ListingStats {
+  const comments = mockComments.filter((c) => c.listingId === id);
+  return {
+    reactions: mockReactions[id] ?? [],
+    comments: comments.length,
+    agentComments: comments.filter((c) => c.isAgent).length,
+  };
+}
+
+// The next-older listing in the same subcategory ("next in cameras").
+export function getNextListing(listing: Listing): Listing | undefined {
+  const siblings = getListings(listing.category, listing.subcategory);
+  return siblings[siblings.indexOf(listing) + 1];
+}
+
+// Avatars are generated locally (never fetched from a third-party API) so that
+// viewing a page doesn't leak the visitor's IP or browsing to anyone else.
+const avatarCache = new Map<string, string>();
+
+export function getAvatarUrl(seed: string): string {
+  let uri = avatarCache.get(seed);
+  if (!uri) {
+    uri = createAvatar(bottts, { seed }).toDataUri();
+    avatarCache.set(seed, uri);
+  }
+  return uri;
 }

@@ -65,9 +65,27 @@ export const SUBCATEGORIES: Record<Category, string[]> = {
   for_sale: ["antiques", "appliances", "arts & crafts", "cameras", "clothing", "computers", "electronics", "furniture", "garage sale", "jewelry", "musical instruments", "sporting", "tools", "video gaming"],
 };
 
+export function isCategory(value: string): value is Category {
+  return Object.hasOwn(CATEGORY_LABELS, value);
+}
+
+// URL-safe slug for a subcategory label: "admin / office" → "admin-office",
+// "farm & garden" → "farm-garden".
+export function subcategorySlug(label: string): string {
+  return label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+// Reverse lookup: slug → subcategory label, or undefined if the slug isn't in the category.
+export function subcategoryFromSlug(category: Category, slug: string): string | undefined {
+  return SUBCATEGORIES[category].find((label) => subcategorySlug(label) === slug);
+}
+
 export const REACTION_TYPES: { type: ReactionType; glyph: string; label: string }[] = [
-  { type: "upvote", glyph: "👍", label: "upvote" },
-  { type: "downvote", glyph: "👎", label: "downvote" },
-  { type: "curiosity", glyph: "🤔", label: "curiosity" },
-  { type: "interest", glyph: "✨", label: "interest" },
+  { type: "upvote", glyph: "+", label: "upvote" },
+  { type: "downvote", glyph: "−", label: "downvote" },
+  { type: "curiosity", glyph: "?", label: "curious" },
+  { type: "interest", glyph: "✦", label: "interested" },
 ];
